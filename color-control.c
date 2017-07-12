@@ -29,38 +29,9 @@ static uint32_t eval_while(vm_t* vm) {
   return ret;
 }
 
-static void skip_elif(vm_t* vm) {
-  while (*vm->pc == ELIF) {
-    vm->pc++;
-    skip(vm), skip(vm);
-  }
-  if (*vm->pc == ELSE) {
-    vm->pc++;
-    skip(vm);
-  }
-}
-
-static void skip_if(vm_t* vm) {
-  skip(vm), skip(vm);
-  return skip_elif(vm);
-}
-
 static uint32_t eval_if(vm_t* vm) {
-  top:
-  if (eval(vm)) {
-    uint32_t ret = eval(vm);
-    skip_elif(vm);
-    return ret;
-  }
+  if (eval(vm)) return eval(vm);
   skip(vm);
-  if (*vm->pc == ELIF) {
-    vm->pc++;
-    goto top;
-  }
-  if (*vm->pc == ELSE) {
-    vm->pc++;
-    return eval(vm);
-  }
   return 0;
 }
 
@@ -208,10 +179,10 @@ uint32_t eval(vm_t* vm) {
     case PWM: return eval_pwm(vm);
     case PIN: return eval_pin(vm);
 
-    case END: case ELIF: case ELSE:
-      vm->on_error(op, "Unexpected END, ELIF or ELSE in eval.");
+    case END:
+      vm->on_error(op, "Illegal opcode");
   }
-  vm->on_error(op, "Unknown opcode in eval.");
+  vm->on_error(op, "Unknown opcode");
   return -1;
 }
 
@@ -243,7 +214,7 @@ static void skip(vm_t* vm) {
     // Operators that consume two expressions
     case ADD: case SUB: case MUL: case DIV: case MOD:
     case LT: case GT: case LTE: case GTE: case EQ: case NEQ:
-    case AND: case OR: case WHILE:
+    case AND: case OR: case WHILE: case IF:
     case PIN:
       return skip(vm), skip(vm);
 
@@ -256,11 +227,10 @@ static void skip(vm_t* vm) {
     case FOR4: case FOR5: case FOR6: case FOR7:
       return skip(vm), skip(vm), skip(vm), skip(vm);
 
-    case IF: return skip_if(vm);
     case DO: return skip_do(vm);
 
-    case END: case ELIF: case ELSE:
-      vm->on_error(op, "Unexpected END, ELIF or ELSE in skip.");
+    case END:
+      vm->on_error(op, "Illegal opcode");
   }
-  vm->on_error(op, "Unknown opcode in skip.");
+  vm->on_error(op, "Unknown opcode");
 }

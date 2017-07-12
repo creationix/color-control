@@ -42,8 +42,8 @@ typedef enum {
   // for variable (start, end, skip, expr)
   FOR0, FOR1, FOR2, FOR3, FOR4, FOR5, FOR6, FOR7,
   // other control flow
-  IF, ELIF, ELSE, // ( if (cond, expr) else if (cond, expr) else (expr) )
   WHILE, // while (cond, expr)
+  IF, // if(conf, expr)
   DO, END, // block of multiple expressions, evaluates to last one
 
   // Color Math
