@@ -36,12 +36,12 @@ int main() {
     .on_delay = delay,
     .vars = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .pc = (uint8_t[]) {
-      // Animate a rainbow
       DO,
+        // Animate a rainbow
         // Repeat the loop getting brighter each time
-        FOR1, 15, U8(255), 32,
-          // (count from 0 to 1535, stepping 27 at a time)
-          FOR0, 0, U16(0x5ff), 32, DO,
+        FOR1, 15, U8(255), 64,
+          // cycle through the whole hue rainbow
+          FOR0, 0, U16(0x5ff), 64, DO,
             // Generate a rainbow rgb value using the loop as hue, update LED
             // Mix in outer loop to dampen initially
             PWM,
@@ -53,9 +53,9 @@ int main() {
             DELAY, 16,
           END,
         // Same thing, but fade to white instead of from black
-        FOR1, 15, U8(255), 16,
-          // (count from 0 to 1535, stepping 27 at a time)
-          FOR0, 0, U16(0x5ff), 27, DO,
+        FOR1, 15, U8(255), 64,
+        // cycle through the whole hue rainbow
+          FOR0, 0, U16(0x5ff), 64, DO,
             // Generate a rainbow rgb value using the loop as hue, update LED
             // Mix in outer loop to dampen initially
             PWM,
@@ -67,8 +67,9 @@ int main() {
             DELAY, 16,
           END,
         // Blink the status leds in unision 3 times
+        // and then alternating 3 times.
         SET1, 1, SET2, 1,
-        FOR0, 1, 6, 1, DO,
+        FOR0, 1, 12, 1, DO,
           // Update the LEDs using variables
           PIN, 1, GET1, PIN, 2, GET2,
           // Delay a bit
@@ -77,13 +78,22 @@ int main() {
           SET1, NOT, GET1,
           SET2, NOT, GET2,
           // Halfway through, switch to alternating
-          IF, EQ, GET0, 5, SET1, 0,
+          IF, EQ, GET0, 6,
+            SET1, 0,
         END,
+
         // Then, just for fun, show this is a general purpose programming lang:
         // Count down with decreasing delays
-        FOR0, U16(500), U16(100), 10, DELAY, GET0,
+        FOR0, U16(500), 0, 25,
+          DELAY, GET0,
+
         // And sum the first 10000 integers for the final return value.
-        FOR0, 1, U16(10000), 1, SET2, ADD, GET0, GET2
+        FOR0, 1, U16(10000), 1,
+          SET3,
+            ADD, GET0, GET3,
+
+      // Make sure to end our outer block
+      END
     }
   };
   printf("result=%u\n", eval(&vm));

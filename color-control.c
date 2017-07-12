@@ -64,7 +64,6 @@ static uint32_t eval_if(vm_t* vm) {
   return 0;
 }
 
-
 static uint32_t eval_do(vm_t* vm) {
   int32_t ret = 0;
   while (*vm->pc != END) ret = eval(vm);
