@@ -1,20 +1,10 @@
-#include <stdlib.h>
 #include "mpc.c"
+#include "stdin.c"
 
 int main() {
 
-  char* input = NULL;
-  size_t l = 0, i = 0;
-  char ch;
-  while ((ch = getchar())) {
-    if (i >= l) input = realloc(input, (l += 256));
-    input[i++] = ch;
-    if (ch == EOF) break;
-  }
-  input[i - 1] = 0;
-  input = realloc(input, i);
+  char* input = read_stdin();
   printf("input '%s'", input);
-
 
   mpc_parser_t *Expr  = mpc_new("expression");
   mpc_parser_t *Prod  = mpc_new("product");
@@ -39,4 +29,5 @@ int main() {
   }
 
   mpc_cleanup(4, Expr, Prod, Value, Maths);
+  free_stdin(input);
 }
