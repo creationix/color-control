@@ -1,4 +1,3 @@
-
 #include "color-control.h"
 
 static void skip(vm_t* vm);
@@ -122,7 +121,7 @@ static uint32_t eval_mix(vm_t* vm) {
 
 static uint32_t eval_delay(vm_t* vm) {
   uint32_t ms = eval(vm);
-  vm->delay(ms);
+  vm->on_delay(ms);
   return ms;
 }
 static uint32_t eval_pwm(vm_t* vm) {
@@ -194,9 +193,9 @@ uint32_t eval(vm_t* vm) {
     case PIN: return eval_pin(vm);
 
     case END: case ELIF: case ELSE:
-      // Invalid operations at top level
-      return -1;
+      vm->on_error(op, "Unexpected END, ELIF or ELSE in eval.");
   }
+  vm->on_error(op, "Unknown opcode in eval.");
   return -1;
 }
 
@@ -215,8 +214,6 @@ static void skip(vm_t* vm) {
     // Operations that don't consume any expressions
     case GET0: case GET1: case GET2: case GET3:
     case GET4: case GET5: case GET6: case GET7:
-    // Also include illegal top-level operations
-    case END: case ELIF: case ELSE:
       return;
 
     // Operators that consume one expression
@@ -245,5 +242,9 @@ static void skip(vm_t* vm) {
 
     case IF: return skip_if(vm);
     case DO: return skip_do(vm);
+
+    case END: case ELIF: case ELSE:
+      vm->on_error(op, "Unexpected END, ELIF or ELSE in skip.");
   }
+  vm->on_error(op, "Unknown opcode in skip.");
 }

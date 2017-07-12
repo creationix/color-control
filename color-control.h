@@ -7,9 +7,11 @@ typedef struct {
   void (*on_pwm)(uint8_t r, uint8_t g, uint8_t b);
   // Called to turn a pin on of off
   void (*on_pin)(uint8_t pin, bool state);
+  // Callback for runtime exceptions.
+  void (*on_error)(uint32_t code, const char* msg);
   // Callback provided by consumer.  This is called when the system wants to
   // pause for a given number of milliseconds.
-  void (*delay)(uint32_t ms);
+  void (*on_delay)(uint32_t ms);
   // 8 global variables
   uint32_t vars[8];
   // Program Counter
