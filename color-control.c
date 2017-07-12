@@ -118,6 +118,22 @@ static uint32_t eval_mix(vm_t* vm) {
           (((rgb1 & 0xff) * x + (rgb2 & 0xff) * y) >> 8);
 }
 
+static uint32_t deadbeef_seed;
+static uint32_t deadbeef_beef = 0xdeadbeef;
+
+static uint32_t eval_srand(vm_t* vm) {
+	deadbeef_seed = eval(vm);
+	deadbeef_beef = 0xdeadbeef;
+  return deadbeef_seed;
+}
+
+static uint32_t eval_rand(vm_t* vm) {
+  uint32_t range = eval(vm);
+	deadbeef_seed = (deadbeef_seed << 7) ^ ((deadbeef_seed >> 25) + deadbeef_beef);
+	deadbeef_beef = (deadbeef_beef << 7) ^ ((deadbeef_beef >> 25) + 0xdeadbeef);
+	return deadbeef_seed % range;
+}
+
 static uint32_t eval_delay(vm_t* vm) {
   uint32_t ms = eval(vm);
   vm->on_delay(ms);
@@ -186,6 +202,8 @@ uint32_t eval(vm_t* vm) {
     case HUE: return eval_hue(vm);
     case RGB: return eval_rgb(vm);
     case MIX: return eval_mix(vm);
+    case RAND: return eval_rand(vm);
+    case SRAND: return eval_srand(vm);
 
     case DELAY: return eval_delay(vm);
     case PWM: return eval_pwm(vm);
@@ -220,7 +238,7 @@ static void skip(vm_t* vm) {
     case SET4: case SET5: case SET6: case SET7:
     case NEG: case NOT:
     case DELAY: case PWM:
-    case HUE:
+    case HUE: case RAND: case SRAND:
       return skip(vm);
 
     // Operators that consume two expressions

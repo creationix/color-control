@@ -50,6 +50,8 @@ typedef enum {
   HUE,  // (hue) => RGB
   RGB, // (ref, green, blue) => RGB
   MIX, // (rgb, rgb, split) => RGB - mix two rgb values
+  SRAND, // Seed the RNG with uint32 value
+  RAND, // Give a random uint32 value
 
   // External I/O functions
   DELAY, PWM, PIN
