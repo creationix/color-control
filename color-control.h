@@ -28,7 +28,7 @@ typedef enum {
   UINT32,      // Consume four extra bytes as value
 
   // Arithmetic
-  ADD, SUB, MUL, DIV, MOD, NEG,
+  ADD, SUB, MUL, DIV, MOD,
 
   // Comparison
   GT, LT, GTE, LTE, EQ, NEQ,

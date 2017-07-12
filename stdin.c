@@ -26,6 +26,6 @@ uint8_t* read_stdin() {
   return input;
 }
 
-void free_stdin(char* input) {
+void free_stdin(uint8_t* input) {
   free(input);
 }

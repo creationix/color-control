@@ -169,7 +169,6 @@ uint32_t eval(vm_t* vm) {
     case MUL: return eval(vm) * eval(vm);
     case DIV: return eval(vm) / eval(vm);
     case MOD: return eval(vm) % eval(vm);
-    case NEG: return -eval(vm);
     // Handle Comparision Operations
     case GT: return eval(vm) > eval(vm);
     case LT: return eval(vm) < eval(vm);
@@ -236,7 +235,7 @@ static void skip(vm_t* vm) {
     // Operators that consume one expression
     case SET0: case SET1: case SET2: case SET3:
     case SET4: case SET5: case SET6: case SET7:
-    case NEG: case NOT:
+    case NOT:
     case DELAY: case PWM:
     case HUE: case RAND: case SRAND:
       return skip(vm);
