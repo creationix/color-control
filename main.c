@@ -10,14 +10,8 @@ static void on_pwm(uint8_t r, uint8_t g, uint8_t b) {
   printf("#%02x%02x%02x - \x1b[48;2;%d;%d;%dm    \x1b[0m\n", r, g, b, r, g, b);
 }
 
-static void on_n1(bool b) {
-  if (b) printf("Turn N1 ON\n");
-  else printf("Turn N1 OFF\n");
-}
-
-static void on_n2(bool b) {
-  if (b) printf("Turn N2 ON\n");
-  else printf("Turn N2 OFF\n");
+static void on_pin(uint8_t pin, bool state) {
+  printf("Turn pin-%d %s\n", pin, state ? "ON" : "OFF");
 }
 
 static void delay(uint32_t ms) {
@@ -32,8 +26,7 @@ static void delay(uint32_t ms) {
 int main() {
   vm_t vm = (vm_t){
     .on_pwm = on_pwm,
-    .on_n1 =  on_n1,
-    .on_n2 =  on_n2,
+    .on_pin =  on_pin,
     .delay =  delay,
     .vars = { 0, 0, 0, 0, 0, 0, 0, 0 },
     .pc = (uint8_t[]) {
@@ -72,7 +65,7 @@ int main() {
         SET1, 1, SET2, 1,
         FOR0, 1, 6, 1, DO,
           // Update the LEDs using variables
-          N1, GET1, N2, GET2,
+          PIN, 1, GET1, PIN, 2, GET2,
           // Delay a bit
           DELAY, U16(250),
           // Invert the variables

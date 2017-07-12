@@ -30,13 +30,41 @@ static uint32_t eval_while(vm_t* vm) {
   return ret;
 }
 
-static uint32_t eval_if(vm_t* vm) {
-
+static void skip_elif(vm_t* vm) {
+  while (*vm->pc == ELIF) {
+    vm->pc++;
+    skip(vm), skip(vm);
+  }
+  if (*vm->pc == ELSE) {
+    vm->pc++;
+    skip(vm);
+  }
 }
 
 static void skip_if(vm_t* vm) {
-
+  skip(vm), skip(vm);
+  return skip_elif(vm);
 }
+
+static uint32_t eval_if(vm_t* vm) {
+  top:
+  if (eval(vm)) {
+    uint32_t ret = eval(vm);
+    skip_elif(vm);
+    return ret;
+  }
+  skip(vm);
+  if (*vm->pc == ELIF) {
+    vm->pc++;
+    goto top;
+  }
+  if (*vm->pc == ELSE) {
+    vm->pc++;
+    return eval(vm);
+  }
+  return 0;
+}
+
 
 static uint32_t eval_do(vm_t* vm) {
   int32_t ret = 0;
@@ -102,20 +130,15 @@ static uint32_t eval_pwm(vm_t* vm) {
   vm->on_pwm((rgb >> 16) & 0xff, (rgb >> 8) & 0xff, rgb & 0xff);
   return rgb;
 }
-static uint32_t eval_n1(vm_t* vm) {
-  bool on = eval(vm);
-  vm->on_n1(on);
-  return on;
-}
-static uint32_t eval_n2(vm_t* vm) {
-  bool on = eval(vm);
-  vm->on_n2(on);
-  return on;
+static uint32_t eval_pin(vm_t* vm) {
+  uint8_t pin = eval(vm);
+  bool state = eval(vm);
+  vm->on_pin(pin, state);
+  return state;
 }
 
 uint32_t eval(vm_t* vm) {
   opcode_t op = *(vm->pc)++;
-  printf("OPCODE=%02x\n", op);
   // If the opcode is less than 128, it's a literal unsigned integer
   if (op < 128) return op;
 
@@ -168,8 +191,7 @@ uint32_t eval(vm_t* vm) {
 
     case DELAY: return eval_delay(vm);
     case PWM: return eval_pwm(vm);
-    case N1: return eval_n1(vm);
-    case N2: return eval_n2(vm);
+    case PIN: return eval_pin(vm);
 
     case END: case ELIF: case ELSE:
       // Invalid operations at top level
@@ -201,7 +223,7 @@ static void skip(vm_t* vm) {
     case SET0: case SET1: case SET2: case SET3:
     case SET4: case SET5: case SET6: case SET7:
     case NEG: case NOT:
-    case DELAY: case PWM: case N1: case N2:
+    case DELAY: case PWM:
     case HUE:
       return skip(vm);
 
@@ -209,6 +231,7 @@ static void skip(vm_t* vm) {
     case ADD: case SUB: case MUL: case DIV: case MOD:
     case LT: case GT: case LTE: case GTE: case EQ: case NEQ:
     case AND: case OR: case WHILE:
+    case PIN:
       return skip(vm), skip(vm);
 
     // Consume 3

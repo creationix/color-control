@@ -5,10 +5,8 @@ typedef struct {
   // Callback provided by consumer.  This will be called every time the LEDs
   // need to change color
   void (*on_pwm)(uint8_t r, uint8_t g, uint8_t b);
-  // Called to turn ethernet TX LED on or off
-  void (*on_n1)(bool b);
-  // Called ot turn ethernet RX LED on or off
-  void (*on_n2)(bool b);
+  // Called to turn a pin on of off
+  void (*on_pin)(uint8_t pin, bool state);
   // Callback provided by consumer.  This is called when the system wants to
   // pause for a given number of milliseconds.
   void (*delay)(uint32_t ms);
@@ -52,7 +50,7 @@ typedef enum {
   MIX, // (rgb, rgb, split) => RGB - mix two rgb values
 
   // External I/O functions
-  DELAY, PWM, N1, N2
+  DELAY, PWM, PIN
 } opcode_t;
 
 // Macros to generating bytecode for literals in C
