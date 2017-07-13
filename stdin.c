@@ -15,14 +15,9 @@ uint8_t* read_stdin() {
       input = realloc(input, (total += 256));
     }
   }
-  if (!count) {
-    free(input);
-    return NULL;
-  }
-  if (count < total) {
-    total = count;
-    input = realloc(input, total);
-  }
+  total = count + 1;
+  input = realloc(input, total);
+  input[count] = 0;
   return input;
 }
 
