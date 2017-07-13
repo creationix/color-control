@@ -29,9 +29,13 @@ int main() {
 
   mpc_parser_t *State  = mpc_new("statement");
   mpc_parser_t *Ident  = mpc_new("ident");
-  mpc_parser_t *Range  = mpc_new("range");
   mpc_parser_t *Number  = mpc_new("number");
   mpc_parser_t *For  = mpc_new("for");
+  mpc_parser_t *If  = mpc_new("if");
+  mpc_parser_t *Assign  = mpc_new("assign");
+  mpc_parser_t *Expr  = mpc_new("expression");
+  mpc_parser_t *Call  = mpc_new("call");
+  mpc_parser_t *Not  = mpc_new("not");
   mpc_parser_t *Or  = mpc_new("or");
   mpc_parser_t *And  = mpc_new("and");
   mpc_parser_t *Equal  = mpc_new("equality");
@@ -39,10 +43,11 @@ int main() {
   mpc_parser_t *Sum  = mpc_new("sum");
   mpc_parser_t *Prod  = mpc_new("product");
   mpc_parser_t *Value = mpc_new("value");
+  mpc_parser_t *Block = mpc_new("block");
   mpc_parser_t *Prog = mpc_new("program");
 
   mpc_err_t* err = mpca_lang_contents(MPCA_LANG_DEFAULT, "script.grammar",
-    State, Ident, Range, Number, For, Or, And, Equal, Comp, Sum, Prod, Value, Prog, NULL);
+    State, Ident, Number, For, If, Assign, Expr, Call, Not, Or, And, Equal, Comp, Sum, Prod, Value, Block, Prog, NULL);
 
   if (err) {
     mpc_err_print(err);
@@ -59,7 +64,7 @@ int main() {
     mpc_err_delete(r.error);
   }
 
-  mpc_cleanup(11, State, Ident, Range, For, Or, And, Equal, Comp, Sum, Prod, Value, Prog);
+  mpc_cleanup(17, State, Ident, For, If, Assign, Expr, Call, Not, Or, And, Equal, Comp, Sum, Prod, Value, Block, Prog);
 
   free_stdin(input);
 }
