@@ -35,7 +35,7 @@ for i in 12 {
   tx = !tx
   rx = !rx
   # Halfway through, make them alternate
-  if i == 6 { tx = false }
+  if i == 5 { tx = false }
 }
 
 # Then, just for fun, show this is a general purpose programming lang:
