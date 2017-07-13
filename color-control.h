@@ -1,3 +1,6 @@
+#ifndef COLOR_CONTROL_H
+#define COLOR_CONTROL_H
+
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -65,3 +68,5 @@ typedef enum {
 #define U32(num) UINT32, ((uint32_t)(num) >> 24), ((uint32_t)(num) >> 16) & 0xff, ((uint32_t)(num) >> 8) & 0xff, (uint32_t)(num) & 0xff
 
 uint32_t eval(vm_t* vm);
+
+#endif
