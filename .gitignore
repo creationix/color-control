@@ -2,3 +2,4 @@ a.out
 *.plist
 compile
 exec
+sample.ast

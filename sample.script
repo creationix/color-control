@@ -1,3 +1,4 @@
+
 # Animate a rainbow starting dark and getting to full saturation
 for b in 15...256 by 64 {
   # cycle through the whole hue rainbow
@@ -15,7 +16,7 @@ for b in 15...256 by 64 {
   # cycle through the whole hue rainbow
   for h in 0x600 by 64 {
     # Mix rainbow towards white
-    pwm(mix(0, hue(h), b))
+    pwm(mix(hue(h), 0xffffff, b))
     delay(16)
   }
 }
@@ -36,15 +37,15 @@ for i in 12 {
   # Halfway through, make them alternate
   if i == 6 { tx = false }
 }
-
-# Then, just for fun, show this is a general purpose programming lang:
-# Count down with decreasing delays
-for i in 500..0 by 25 {
-  delay(i)
-}
-
-# And sum the first 10000 integers for the final return value.
-sum = 0
-for i in 10000 {
-  sum = sum + i
-}
+#
+# # Then, just for fun, show this is a general purpose programming lang:
+# # Count down with decreasing delays
+# for i in 500..0 by 25 {
+#   delay(i)
+# }
+#
+# # And sum the first 10000 integers for the final return value.
+# sum = 0
+# for i in 10000 {
+#   sum = sum + i
+# }

@@ -30,14 +30,14 @@ static void on_error(uint32_t code, const char* msg) {
 }
 
 int main() {
-  char* input = read_stdin();
+  uint8_t* input = read_stdin();
   vm_t vm = (vm_t){
     .on_pwm = on_pwm,
     .on_pin = on_pin,
     .on_error = on_error,
     .on_delay = delay,
     .vars = { 0, 0, 0, 0, 0, 0, 0, 0 },
-    .pc = (uint8_t*)input
+    .pc = input
   };
   printf("result=%u\n", eval(&vm));
   free_stdin(input);

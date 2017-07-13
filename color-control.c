@@ -124,6 +124,9 @@ static uint32_t eval_pin(vm_t* vm) {
 
 uint32_t eval(vm_t* vm) {
   opcode_t op = *(vm->pc)++;
+  // printf("%02x - %08x %08x %08x %08x %08x %08x %08x %08x\n", op,
+  //   vm->vars[0], vm->vars[1], vm->vars[2], vm->vars[3],
+  //   vm->vars[4], vm->vars[5], vm->vars[6], vm->vars[7]);
   // If the opcode is less than 128, it's a literal unsigned integer
   if (op < 128) return op;
 
