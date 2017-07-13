@@ -16,7 +16,7 @@ static void on_pin(uint8_t pin, bool state) {
 }
 
 static void delay(uint32_t ms) {
-  printf("Delay %u\n", ms);
+  // printf("Delay %u\n", ms);
   struct timeval t = {
     .tv_sec = ms / 1000,
     .tv_usec = (ms % 1000) * 1000
