@@ -10,7 +10,7 @@ if : "if" <expression> <block>;
 
 assign : <ident> '=' <expression>;
 
-expression: <call> | <not>;
+expression: <or>;
 
 ident: /[a-zA-Z_][a-zA-Z_0-9]*/;
 
@@ -22,10 +22,6 @@ decimal: /[0-9]+/;
 
 boolean: "true" | "false";
 
-call: <ident> '(' <statement> (',' <statement>)* ')';
-
-not: '!' <or> | <or>;
-
 or : <and> ( "||" <and> )*;
 
 and : <equality> ( "&&" <equality> )*;
@@ -36,9 +32,13 @@ comparison : <sum> ( ("<=" | ">=" | '<' | '>') <sum> )*;
 
 sum : <product> ( ('+' | '-') <product> )*;
 
-product : <value> ( ('*' | '/' | '%') <value> )*;
+product : <not> ( ('*' | '/' | '%') <not> )*;
 
-value : <number> | <ident> | '(' <statement> ')';
+not: '!' <value> | <value>;
+
+call:  <ident> '(' <statement> (',' <statement>)* ')';
+
+value : <number> | <call> | <ident> | '(' <statement> ')';
 
 block: '{' <statement>* '}';
 

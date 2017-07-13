@@ -1,3 +1,19 @@
+h = 0
+for i in 3 {
+  for b in 0..255 by 4 {
+    h = (h + rand(10)) % 0x600
+    pwm(mix(0, hue(h), b))
+    # Delay enough to get 60fps
+    delay(16)
+  }
+  for b in 255..0 by 4 {
+    h = (h + 7) % 0x600
+    pwm(mix(0, hue(h), b))
+    # Delay enough to get 60fps
+    delay(16)
+  }
+}
+
 
 # Animate a rainbow starting dark and getting to full saturation
 for b in 15...256 by 64 {
@@ -39,12 +55,7 @@ for i in 12 {
 }
 
 # Then, just for fun, show this is a general purpose programming lang:
-# Count down with decreasing delays
-for i in 500..0 by 25 {
-  delay(i)
-}
-
-# And sum the first 10000 integers for the final return value.
+# sum the first 10000 integers for the final return value.
 sum = 0
 for i in 1..10000 {
   sum = sum + i
