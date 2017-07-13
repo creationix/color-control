@@ -1,5 +1,8 @@
 CFLAGS=-g -m64 -std=c99 -Wall -Wshadow -Wpointer-arith -Wstrict-prototypes
 
+pipe: sample.script compile exec 
+	cat $< | ./compile | ./exec
+
 run: sample.ast exec
 	cat $< | ./exec
 

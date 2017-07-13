@@ -77,12 +77,9 @@ uint32_t parse_number(mpc_ast_t* ast) {
 }
 
 static void generate_assign(mpc_ast_t* ast) {
-
-  mpc_ast_print_to(ast, stderr);
-  // Emit the FOR for the proper loop variable
   uint8_t id = intern_ident(ast->children[0]->contents);
   putchar(SET0 + id);
-  generate_statement(ast->children[1]);
+  generate_statement(ast->children[2]);
 }
 
 static void generate_for(mpc_ast_t* ast) {
@@ -126,7 +123,7 @@ static fn_def_t fns[] = {
   {"rand", 1, RAND},
   {"delay", 1, DELAY},
   {"pwm", 1, PWM},
-  {"pin", 1, PIN},
+  {"pin", 2, PIN},
   {NULL}
 };
 
@@ -182,19 +179,36 @@ static void generate_product(mpc_ast_t* ast) {
   generate_statement(ast->children[2]);
 }
 
+static void generate_equality(mpc_ast_t* ast) {
+  const char* op = ast->children[1]->contents;
+  if (!strcmp("<", op)) putchar(LT);
+  else if (!strcmp(">", op)) putchar(GT);
+  else if (!strcmp("<=", op)) putchar(LTE);
+  else if (!strcmp(">=", op)) putchar(GTE);
+  else if (!strcmp("==", op)) putchar(EQ);
+  else if (!strcmp("!=", op)) putchar(NEQ);
+  else assert(-1);
+  generate_statement(ast->children[0]);
+  generate_statement(ast->children[2]);
+}
+
 static void generate_value(mpc_ast_t* ast) {
   if (ast->children[0]->contents[0] == '(') {
     return generate_statement(ast->children[1]);
   }
   mpc_ast_print_to(ast, stderr);
   exit(-1);
-  switch (ast->children[1]->contents[0]) {
-    case '-': putchar(SUB); break;
-    case '+': putchar(ADD); break;
-    default: assert(false);
-  }
-  generate_statement(ast->children[0]);
-  generate_statement(ast->children[2]);
+}
+
+static void generate_not(mpc_ast_t* ast) {
+  putchar(NOT);
+  generate_statement(ast->children[1]);
+}
+
+static void generate_if(mpc_ast_t* ast) {
+  putchar(IF);
+  generate_statement(ast->children[1]);
+  generate_block(ast->children[2]);
 }
 
 static void generate_statement(mpc_ast_t* ast) {
@@ -207,6 +221,9 @@ static void generate_statement(mpc_ast_t* ast) {
   if (is(ast, "call|>")) return generate_call(ast);
   if (is(ast, "sum|>")) return generate_sum(ast);
   if (is(ast, "product|>")) return generate_product(ast);
+  if (is(ast, "equality|>")) return generate_equality(ast);
+  if (is(ast, "not|>")) return generate_not(ast);
+  if (is(ast, "if|>")) return generate_if(ast);
   if (is(ast, "value|>")) return generate_value(ast);
   mpc_ast_print_to(ast, stderr);
   fprintf(stderr, "UNKNOWN: %s\n", ast->tag);
