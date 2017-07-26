@@ -6,13 +6,19 @@ pipe: sample.script compile exec
 run: sample.ast exec
 	cat $< | ./exec
 
-sample.ast: sample.script test compile script.grammar
+run-serial: sample.script compile exec-serial
+	cat $< | ./compile | ./exec-serial
+
+sample.ast: sample.script compile script.grammar
 	cat sample.script | ./compile > $@
 
 compile: compile.c stdin.c stdin.h mpc.c mpc.h color-control.h
 	$(CC) $(CFLAGS) $< -o $@
 
 exec: exec.c stdin.c stdin.h color-control.c color-control.h
+	$(CC) $(CFLAGS) $< -o $@
+
+exec-serial: exec-serial.c stdin.c stdin.h color-control.c color-control.h
 	$(CC) $(CFLAGS) $< -o $@
 
 clean:

@@ -5,6 +5,8 @@
 
 #include "stdin.h"
 
+uint8_t totalSize;
+
 uint8_t* read_stdin() {
   size_t total = 256;
   size_t count = 0;
@@ -17,10 +19,17 @@ uint8_t* read_stdin() {
       input = realloc(input, (total += 256));
     }
   }
-  total = count + 1;
-  input = realloc(input, total);
-  input[count] = 0;
+  total = count; //+ 1;
+  totalSize = total;
+//   input = realloc(input, total);
+//   input[count] = 0;
   return input;
+}
+
+uint8_t read_stdin_serial(uint8_t** buf){
+  *buf = read_stdin();
+  
+  return totalSize;
 }
 
 void free_stdin(uint8_t* input) {

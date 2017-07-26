@@ -31,6 +31,12 @@ static void on_error(uint32_t code, const char* msg) {
 
 int main() {
   uint8_t* input = read_stdin();
+  
+  for (int i = 0; i < 145; i++)
+  {
+    printf("%#02x%s\n", input[i], "-");
+  }
+  
   vm_t vm = (vm_t){
     .on_pwm = on_pwm,
     .on_pin = on_pin,
