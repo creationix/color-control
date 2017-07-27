@@ -43,7 +43,7 @@ int main() {
   printf("\n\n");
 
   // TODO: Make this an input arg or something
-  const char* serial_path = "/dev/ttyUSB0";
+  const char* serial_path = "/dev/ttyACM0";
   printf("Writing to %s...\n", serial_path);
   int fd = open(serial_path, 1);
   if (fd < 0) {

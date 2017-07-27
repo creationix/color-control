@@ -1,0 +1,5 @@
+r
+loadbin daplie.bin 0
+r
+g
+exit
