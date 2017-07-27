@@ -1,24 +1,16 @@
-# # Animate a pulsing rainbow
-# for i in 10 {
-#   pwm(rgb(255,0,0))
-#   delay(500)
-#   pwm(rgb(0,255,0))
-#   delay(500)
-#   pwm(rgb(0,0,255) )
-#   delay(1000)
-# }
+# Animate a pulsing rainbow
 
 h = 0
-for i in 3 {
+for i in 5 {
   for b in 0..255 by 4 {
     h = (h + rand(10)) % 0x600
     pwm(mix(0, hue(h), b))
-    delay(16)
+    delay(33)
   }
   for b in 255..0 by 4 {
     h = (h + 7) % 0x600
     pwm(mix(0, hue(h), b))
-    delay(16)
+    delay(33)
   }
 }
 #

@@ -1,10 +1,13 @@
 CFLAGS=-g -m64 -std=c99 -Wall -Wshadow -Wpointer-arith -Wstrict-prototypes
 
-pipe: sample.script compile exec 
+pipe: sample.script compile exec
 	cat $< | ./compile | ./exec
 
 run: sample.ast exec
 	cat $< | ./exec
+
+jflash: daplie.bin flash.jlink
+	JLinkExe -device STM32F042F4 -if swd -speed 4000 flash.jlink
 
 run-serial: sample.script compile exec-serial
 	cat $< | ./compile | ./exec-serial
