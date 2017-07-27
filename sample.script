@@ -51,10 +51,10 @@ for i in 12 {
   # Halfway through, make them alternate
   if i == 5 { tx = false }
 }
-
-# Then, just for fun, show this is a general purpose programming lang:
-# sum the first 10000 integers for the final return value.
-sum = 0
-for i in 1..10000 {
-  sum = sum + i
-}
+#
+# # Then, just for fun, show this is a general purpose programming lang:
+# # sum the first 10000 integers for the final return value.
+# sum = 0
+# for i in 1..10000 {
+#   sum = sum + i
+# }
