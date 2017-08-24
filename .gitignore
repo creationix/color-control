@@ -1,6 +1,8 @@
 a.out
 *.plist
+*.ast
 compile
 exec
 exec-serial
+exe-shell
 sample.ast
