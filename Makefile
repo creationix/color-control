@@ -9,7 +9,7 @@ run-shell: sample.ast exec
 jflash: daplie.bin flash.jlink
 	JLinkExe -device STM32F042F4 -if swd -speed 4000 flash.jlink
 
-run: sample.script compile exec-serial
+run: sample.script compile exec
 	cat $< | ./compile | ./exec
 
 sample.ast: sample.script compile script.grammar
