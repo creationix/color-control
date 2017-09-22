@@ -42,7 +42,13 @@ Run `make run`
 
 If the configuration is correct, you should now see the lights on the outer rim of the Daplie board go through a series of colors.  <br><br>
 
+NOTE:  If you get the following, but don't get a rainbow pulse:
 
+```
+cat sample.script | ./compile | ./exec
+```
+
+run the command `make clean` and then do the `make run` again.  It should work after a clean rebuild.  <br><br>
 
 **Legacy Notes (from previous README version)**<br><br>
 
