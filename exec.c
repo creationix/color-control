@@ -7,8 +7,14 @@
 #include "color-control.c"
 #include "stdin.c"
 
-static void on_pwm(uint8_t r, uint8_t g, uint8_t b) {
-  printf("#%02x%02x%02x - \x1b[48;2;%d;%d;%dm    \x1b[0m\n", r, g, b, r, g, b);
+static void on_update(uint8_t* pixels) {
+  for (int i = 0; i < LED_COUNT * LED_BPP; i += LED_BPP) {
+    printf("\x1b[48;2;%d;%d;%dm   ",
+      pixels[i],
+      pixels[i + 1],
+      pixels[i + 2]);
+  }
+  printf("\x1b[0m\n");
 }
 
 static void on_pin(uint8_t pin, bool state) {
@@ -32,7 +38,7 @@ static void on_error(uint32_t code, const char* msg) {
 int main() {
   uint8_t* input = read_stdin();
   vm_t vm = (vm_t){
-    .on_pwm = on_pwm,
+    .on_update = on_update,
     .on_pin = on_pin,
     .on_error = on_error,
     .on_delay = delay,

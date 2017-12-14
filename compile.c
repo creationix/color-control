@@ -12,9 +12,11 @@ static uint8_t intern_ident(const char* ident) {
   for (int i = 0; i < 8; i++) {
     if (!names[i]) {
       names[i] = ident;
+      // fprintf(stderr, "Found %s at %d\n", ident, i);
       return i;
     }
     if (!strcmp(names[i], ident)) {
+      // fprintf(stderr, "Added %s at %d\n", ident, i);
       return i;
     }
   }
@@ -122,7 +124,10 @@ static fn_def_t fns[] = {
   {"srand", 1, SRAND},
   {"rand", 1, RAND},
   {"delay", 1, DELAY},
-  {"pwm", 1, PWM},
+  {"fill", 1, FILL},
+  {"fade", 2, FADE},
+  {"write", 2, WRITE},
+  {"update", 0, UPDATE},
   {"pin", 2, PIN},
   {NULL}
 };

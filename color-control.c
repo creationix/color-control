@@ -1,4 +1,5 @@
 #include "color-control.h"
+// #include <stdio.h>
 
 static void skip(vm_t* vm);
 
@@ -11,6 +12,7 @@ static uint32_t eval_for(uint8_t var, vm_t* vm) {
   if (i <= j) j -= (j - i) % s;
   else j += (i - j) % s, s = -s;
   while (true) {
+    // printf("LOOP SET %d=%d\n", var, i);
     vm->vars[var] = i;
     vm->pc = pc;
     ret = eval(vm);
@@ -65,6 +67,7 @@ static uint32_t eval_hue(vm_t* vm) {
   (h < 0x500) ? (r = h - 0x400, g = 0, b = 0xff) :
   // Magenta to Red
                 (r = 0xff, g = 0, b = 0x5ff - h);
+  // printf("h=%d rgb=%02x %02x %02x\n", h, r, g, b);
   return (r << 16) | (g << 8) | b;
 }
 
@@ -110,16 +113,52 @@ static uint32_t eval_delay(vm_t* vm) {
   vm->on_delay(ms);
   return ms;
 }
-static uint32_t eval_pwm(vm_t* vm) {
-  uint32_t rgb = eval(vm);
-  vm->on_pwm((rgb >> 16) & 0xff, (rgb >> 8) & 0xff, rgb & 0xff);
-  return rgb;
+static uint32_t eval_update(vm_t* vm) {
+  vm->on_update(vm->pixels);
+  return 0;
 }
 static uint32_t eval_pin(vm_t* vm) {
   uint8_t pin = eval(vm);
   bool state = eval(vm);
   vm->on_pin(pin, state);
   return state;
+}
+
+static uint32_t eval_fill(vm_t* vm) {
+  uint32_t rgb = eval(vm);
+  for (int i = 0; i < LED_COUNT * LED_BPP; i += LED_BPP) {
+    vm->pixels[i] = (rgb >> 16) & 0xff;
+    vm->pixels[i + 1] = (rgb >> 8) & 0xff;
+    vm->pixels[i + 2] = (rgb >> 0) & 0xff;
+  }
+  return rgb;
+}
+
+static uint32_t eval_fade(vm_t* vm) {
+  uint32_t rgb = eval(vm);
+  // y is mix between values
+  // 0 is all left
+  // 255 is all right
+  uint32_t y = (eval(vm) & 0xff) + 1;
+  uint32_t x = 0;
+  for (int i = 0; i < LED_COUNT * LED_BPP; i += LED_BPP) {
+    vm->pixels[i + 0] = (vm->pixels[i + 0] * x + ((rgb >> 16) & 0xff) * y) >> 8;
+    vm->pixels[i + 1] = (vm->pixels[i + 1] * x + ((rgb >>  8) & 0xff) * y) >> 8;
+    vm->pixels[i + 2] = (vm->pixels[i + 2] * x + ((rgb >>  0) & 0xff) * y) >> 8;
+  }
+  return rgb;
+}
+
+static uint32_t eval_write(vm_t* vm) {
+  uint32_t index = eval(vm);
+  uint32_t rgb = eval(vm);
+  if (index < LED_COUNT) {
+    int i = index * LED_BPP;
+    vm->pixels[i + 0] = (rgb >> 16) & 0xff;
+    vm->pixels[i + 1] = (rgb >>  8) & 0xff;
+    vm->pixels[i + 2] = (rgb >>  0) & 0xff;
+  }
+  return rgb;
 }
 
 uint32_t eval(vm_t* vm) {
@@ -158,9 +197,11 @@ uint32_t eval(vm_t* vm) {
     // Handle variable reads/writes
     case GET0: case GET1: case GET2: case GET3:
     case GET4: case GET5: case GET6: case GET7:
+      // printf("GET=%d\n", op - GET0);
       return vm->vars[op - GET0];
     case SET0: case SET1: case SET2: case SET3:
     case SET4: case SET5: case SET6: case SET7:
+      // printf("SET=%d\n", op - SET0);
       return vm->vars[op - SET0] = eval(vm);
     // Handle variable loops
     case FOR0: case FOR1: case FOR2: case FOR3:
@@ -178,8 +219,12 @@ uint32_t eval(vm_t* vm) {
     case RAND: return eval_rand(vm);
     case SRAND: return eval_srand(vm);
 
+    case WRITE: return eval_write(vm);
+    case FILL: return eval_fill(vm);
+    case FADE: return eval_fade(vm);
+
     case DELAY: return eval_delay(vm);
-    case PWM: return eval_pwm(vm);
+    case UPDATE: return eval_update(vm);
     case PIN: return eval_pin(vm);
 
     case END:
@@ -202,6 +247,7 @@ static void skip(vm_t* vm) {
     case UINT32:  vm->pc += 4; return;
 
     // Operations that don't consume any expressions
+    case UPDATE:
     case GET0: case GET1: case GET2: case GET3:
     case GET4: case GET5: case GET6: case GET7:
       return;
@@ -210,20 +256,21 @@ static void skip(vm_t* vm) {
     case SET0: case SET1: case SET2: case SET3:
     case SET4: case SET5: case SET6: case SET7:
     case NOT:
-    case DELAY: case PWM:
+    case DELAY:
     case HUE: case RAND: case SRAND:
+    case FILL:
       return skip(vm);
 
     // Operators that consume two expressions
     case ADD: case SUB: case MUL: case DIV: case MOD:
     case LT: case GT: case LTE: case GTE: case EQ: case NEQ:
     case AND: case OR: case WHILE: case IF:
-    case PIN:
+    case PIN: case WRITE: case FADE:
       return skip(vm), skip(vm);
 
     // Consume 3
     case RGB: case MIX:
-      return skip(vm), skip(vm);
+      return skip(vm), skip(vm), skip(vm);
 
     // Operators that consume 4 expressions
     case FOR0: case FOR1: case FOR2: case FOR3:
