@@ -1,3 +1,5 @@
+*Warning*, this part of the SDK is still in development while we work with our hardware in China.
+
 # MCU "Rainbow Test"
 
 This is a test of the lights on the Daplie board, to test that the MCU has been flashed correctly, and that the MCU light commands are working as intended.<br><br>
@@ -34,13 +36,13 @@ Run this command to verify that the correct TTY is set up:<br>
 ls /dev | grep ttyACM0
 ```
 <br>
-Run `git clone https://git.daplie.com/Daplie/mcu-controller.git --recursive` to create the test environment.  
+Run `git clone https://gitlab.daplie.com/core-sdk/color-control.git --recursive` to create the test environment.  
 
-When the clone finishes, `cd` into the directory `~/mcu-controller`.
+When the clone finishes, `cd` into the directory `~/color-control`.
 
 Run `make run`
 
-If the configuration is correct, you should now see the lights on the outer rim of the Daplie board go through a series of colors.  <br><br>
+If the configuration is correct, you should now see the lights inside of the Daplie board go through a series of colors.  <br><br>
 
 NOTE:  If you get the following, but don't get a rainbow pulse:
 
