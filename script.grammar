@@ -36,7 +36,7 @@ product : <not> ( ('*' | '/' | '%') <not> )*;
 
 not: '!' <value> | <value>;
 
-call:  <ident> '(' <statement> (',' <statement>)* ')';
+call:  <ident> '(' <statement>? (',' <statement>)* ')';
 
 value : <number> | <call> | <ident> | '(' <statement> ')';
 

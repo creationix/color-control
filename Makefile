@@ -3,7 +3,7 @@ CFLAGS=-g -Wall -Wshadow -Wpointer-arith -Wstrict-prototypes
 pipe: sample.script compile exec
 	cat $< | ./compile | ./exec
 
-run-shell: sample.ast exec
+run-shell: sample.ast exec-shell
 	cat $< | ./exec-shell
 
 jflash: daplie.bin flash.jlink

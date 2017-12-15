@@ -4,10 +4,18 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#ifndef LED_COUNT
+#define LED_COUNT 8
+#endif
+
+#ifndef LED_BPP
+#define LED_BPP 3
+#endif
+
 typedef struct {
   // Callback provided by consumer.  This will be called every time the LEDs
   // need to change color
-  void (*on_pwm)(uint8_t r, uint8_t g, uint8_t b);
+  void (*on_update)(uint8_t* pixels);
   // Called to turn a pin on of off
   void (*on_pin)(uint8_t pin, bool state);
   // Callback for runtime exceptions.
@@ -15,6 +23,8 @@ typedef struct {
   // Callback provided by consumer.  This is called when the system wants to
   // pause for a given number of milliseconds.
   void (*on_delay)(uint32_t ms);
+  // RGB Pixel data
+  uint8_t pixels[LED_COUNT * LED_BPP];
   // 8 global variables
   uint32_t vars[8];
   // Program Counter
@@ -56,8 +66,12 @@ typedef enum {
   SRAND, // Seed the RNG with uint32 value
   RAND, // Give a random uint32 value
 
+  WRITE, // (index, RGB)
+  FILL, // (RGB) - write all pixels same color
+  FADE, // (RGB, split) - mix all pixels with given color
+
   // External I/O functions
-  DELAY, PWM, PIN
+  DELAY, UPDATE, PIN
 } opcode_t;
 
 // Macros to generating bytecode for literals in C
