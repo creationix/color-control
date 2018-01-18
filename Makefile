@@ -1,28 +1,28 @@
-CFLAGS=-g -Wall -Wshadow -Wpointer-arith -Wstrict-prototypes
+# CFLAGS=-g -Wall -Wshadow -Wpointer-arith -Wstrict-prototypes
+CFLAGS=-Werror -Wall -Wshadow -Wpointer-arith
+TARGETS= \
+ 	color-control-compile \
+	color-control-simulate \
+	color-control-upload
 
-pipe: sample.script compile exec
-	cat $< | ./compile | ./exec
-
-run-shell: sample.ast exec-shell
-	cat $< | ./exec-shell
-
-jflash: daplie.bin flash.jlink
-	JLinkExe -device STM32F042F4 -if swd -speed 4000 flash.jlink
-
-run: sample.script compile exec
-	cat $< | ./compile | ./exec
-
-sample.ast: sample.script compile script.grammar
-	cat sample.script | ./compile > $@
-
-compile: compile.c stdin.c stdin.h mpc.c mpc.h color-control.h
-	$(CC) $(CFLAGS) $< -o $@
-
-exec-shell: exec.c stdin.c stdin.h color-control.c color-control.h
-	$(CC) $(CFLAGS) $< -o $@
-
-exec: exec-serial.c stdin.c stdin.h color-control.c color-control.h
-	$(CC) $(CFLAGS) $< -o $@
+all: $(TARGETS)
 
 clean:
-	rm -f compile exec exec-shell sample.ast
+	rm -f $(TARGETS)
+
+mpc:
+	git submodule update --init
+
+color-control-%: src/%.c src/libs/stdin.c src/libs/stdin.h src/libs/color-control.c src/libs/color-control.h src/mpc
+	$(CC) $(CFLAGS) $< -o $@
+
+test: test-simulator test-frame test-upload
+
+test-simulator: $(TARGETS)
+	./color-control-compile < scripts/power-rainbow.script | ./color-control-simulate
+
+test-frame: $(TARGETS)
+	./color-control-compile < scripts/power-rainbow.script | ./color-control-upload /dev/stdout | hexdump -C
+
+test-upload: $(TARGETS)
+	./color-control-compile < scripts/power-rainbow.script | ./color-control-upload /dev/ttyACM0

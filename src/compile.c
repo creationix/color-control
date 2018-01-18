@@ -1,7 +1,7 @@
 #include <assert.h>
-#include "mpc.c"
-#include "stdin.c"
-#include "color-control.h"
+#include "mpc/mpc.c"
+#include "libs/stdin.c"
+#include "libs/color-control.h"
 
 static const char* names[8];
 
@@ -268,7 +268,30 @@ int main() {
   mpc_parser_t *Block = mpc_new("block");
   mpc_parser_t *Prog = mpc_new("program");
 
-  mpc_err_t* err = mpca_lang_contents(MPCA_LANG_DEFAULT, "script.grammar",
+  mpc_err_t* err = mpca_lang(MPCA_LANG_DEFAULT,
+    "statement: <for> | <if> | <assign> | <expression>;"
+    "for : \"for\" <ident> \"in\" <number> <range>? <by>? <block>;"
+    "range: /\\.\\.\\.?/ <number>;"
+    "by: \"by\" <number>;"
+    "if : \"if\" <expression> <block>;"
+    "assign : <ident> '=' <expression>;"
+    "expression: <or>;"
+    "ident: /[a-zA-Z_][a-zA-Z_0-9]*/;"
+    "number: <boolean> | <hex> | <decimal>;"
+    "hex: /0x[0-9a-f]+/;"
+    "decimal: /[0-9]+/;"
+    "boolean: \"true\" | \"false\";"
+    "or : <and> ( \"||\" <and> )*;"
+    "and : <equality> ( \"&&\" <equality> )*;"
+    "equality : <comparison> ( (\"==\" | \"!=\") <comparison> )*;"
+    "comparison : <sum> ( (\"<=\" | \">=\" | '<' | '>') <sum> )*;"
+    "sum : <product> ( ('+' | '-') <product> )*;"
+    "product : <not> ( ('*' | '/' | '%') <not> )*;"
+    "not: '!' <value> | <value>;"
+    "call:  <ident> '(' <statement>? (',' <statement>)* ')';"
+    "value : <number> | <call> | <ident> | '(' <statement> ')';"
+    "block: '{' <statement>* '}';"
+    "program : /^/ <statement>* /$/;",
     State, Ident, Number, Hex, Dec, Bool, For, Range, By, If, Assign, Expr, Call, Not, Or, And, Equal, Comp, Sum, Prod, Value, Block, Prog, NULL);
 
   if (err) {
@@ -276,7 +299,7 @@ int main() {
     return -1;
   }
 
-  uint8_t* input = read_stdin();
+  uint8_t* input = stdin_read(NULL);
 
   // replace comments with white space as preprocessor.
   {
@@ -298,7 +321,7 @@ int main() {
     }
   }
 
-  // printf("\n## Source ##\n\n%s\n", input);
+  // fprintf(stderr, "\n## Source with comments stripped ##\n\n%s\n", input);
 
   mpc_result_t r;
   if (mpc_parse("input", (char*)input, Prog, &r)) {
@@ -309,7 +332,7 @@ int main() {
     mpc_err_print_to(r.error, stderr);
     mpc_err_delete(r.error);
   }
-  free_stdin(input);
+  stdin_free(input);
 
   mpc_cleanup(21, State, Ident, Number, Hex, Dec, Bool, For, Range, By, If, Assign, Expr, Call, Not, Or, And, Equal, Comp, Sum, Prod, Value, Block, Prog);
 

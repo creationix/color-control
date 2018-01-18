@@ -21,13 +21,13 @@ echo $my_tty
 screen -xRS daplie $my_tty 115200
 ```
 
-To connect via SSH, you will need to determine what IP and/or hostname the board is.  If you did not set the board up yourself, 
+To connect via SSH, you will need to determine what IP and/or hostname the board is.  If you did not set the board up yourself,
 you will need to contact a team member to get the IP and hostname (SSH) information.  When you have that, you will need to SSH as `root`.  
 There is no password on the test boards.<br><br>
 
 **Step 2:  Run the test:**<br>
 
-Once connected to the Daplie board, run the `reboot` command.  When the Daplie board reboots, the lights around the outside perimeter of 
+Once connected to the Daplie board, run the `reboot` command.  When the Daplie board reboots, the lights around the outside perimeter of
 the Daplie board should turn `green` and then fade out.
 
 Run this command to verify that the correct TTY is set up:<br>
@@ -40,20 +40,22 @@ Run `git clone https://gitlab.daplie.com/core-sdk/color-control.git --recursive`
 
 When the clone finishes, `cd` into the directory `~/color-control`.
 
-Run `make run`
+Run `make`
 
-If the configuration is correct, you should now see the lights inside of the Daplie board go through a series of colors.  <br><br>
+Run the following to test the compiler and interpreter in a linux simulator
 
-NOTE:  If you get the following, but don't get a rainbow pulse:
-
-```
-cat sample.script | ./compile | ./exec
+```sh
+./color-control-compile < scripts/power-rainbow.script | ./color-control-simulate
 ```
 
-run the command `make clean` and then do the `make run` again.  It should work after a clean rebuild.  <br><br>
+To test on device, do:
 
-**Legacy Notes (from previous README version)**<br><br>
+```sh
+./color-control-compile < scripts/power-rainbow.script | ./color-control-upload /dev/ttyACM0
+```
 
-- Install `tcc` on linux (`sudo apt-get install tcc`)
-- Source the aliases in bash to get `compile` and `exec` commands. (`. alias.sh`)
-- Run the test script through the compiler and the emulator. (`cat test | compile | exec`)
+You can test the framing in linux by passing in `/dev/stdout` as the serial device:
+
+```sh
+./color-control-compile < scripts/power-rainbow.script | ./color-control-upload /dev/stdout | hexdump -C
+```

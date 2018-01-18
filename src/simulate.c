@@ -4,8 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "color-control.c"
-#include "stdin.c"
+#include "libs/color-control.c"
+#include "libs/stdin.c"
 
 static void on_update(uint8_t* pixels) {
   for (int i = 0; i < LED_COUNT * LED_BPP; i += LED_BPP) {
@@ -36,7 +36,7 @@ static void on_error(uint32_t code, const char* msg) {
 }
 
 int main() {
-  uint8_t* input = read_stdin();
+  uint8_t* input = stdin_read(NULL);
   vm_t vm = (vm_t){
     .on_update = on_update,
     .on_pin = on_pin,
@@ -46,5 +46,5 @@ int main() {
     .pc = input
   };
   printf("result=%u\n", eval(&vm));
-  free_stdin(input);
+  stdin_free(input);
 }

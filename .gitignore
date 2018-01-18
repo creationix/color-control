@@ -1,9 +1,3 @@
-a.out
-*.plist
-*.ast
-compile
-exec
-exec-serial
-exe-shell
-sample.ast
-exec-shell
+color-control-compile
+color-control-simulate
+color-control-upload
