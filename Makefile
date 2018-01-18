@@ -10,7 +10,7 @@ all: $(TARGETS)
 clean:
 	rm -f $(TARGETS)
 
-mpc:
+src/mpc:
 	git submodule update --init
 
 color-control-%: src/%.c src/libs/stdin.c src/libs/stdin.h src/libs/color-control.c src/libs/color-control.h src/mpc
