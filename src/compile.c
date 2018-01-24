@@ -8,6 +8,10 @@ static const char* names[8];
 static void generate_block(mpc_ast_t* ast);
 static void generate_statement(mpc_ast_t* ast);
 
+static uint16_t output_len = 4;
+static uint8_t output[256*256];
+#define pushchar(byte) (output[output_len++] = byte)
+
 static uint8_t intern_ident(const char* ident) {
   for (int i = 0; i < 8; i++) {
     if (!names[i]) {
@@ -38,29 +42,29 @@ static bool is(mpc_ast_t* ast, const char* tag) {
 static void generate_number(uint32_t num) {
   // fprintf(stderr, "Generate Num %u - %08x\n", num, num);
   if (num < 0x80) {
-    putchar((char)num);
+    pushchar((char)num);
   }
   else if (num < 0x100) {
-    putchar(UINT8);
-    putchar(num);
+    pushchar(UINT8);
+    pushchar(num);
   }
   else if (num < 0x10000) {
-    putchar(UINT16);
-    putchar(num >> 8);
-    putchar(num);
+    pushchar(UINT16);
+    pushchar(num >> 8);
+    pushchar(num);
   }
   else if (num < 0x1000000) {
-    putchar(UINT24);
-    putchar(num >> 16);
-    putchar(num >> 8);
-    putchar(num);
+    pushchar(UINT24);
+    pushchar(num >> 16);
+    pushchar(num >> 8);
+    pushchar(num);
   }
   else {
-    putchar(UINT32);
-    putchar(num >> 24);
-    putchar(num >> 16);
-    putchar(num >> 8);
-    putchar(num);
+    pushchar(UINT32);
+    pushchar(num >> 24);
+    pushchar(num >> 16);
+    pushchar(num >> 8);
+    pushchar(num);
   }
 }
 
@@ -80,7 +84,7 @@ uint32_t parse_number(mpc_ast_t* ast) {
 
 static void generate_assign(mpc_ast_t* ast) {
   uint8_t id = intern_ident(ast->children[0]->contents);
-  putchar(SET0 + id);
+  pushchar(SET0 + id);
   generate_statement(ast->children[2]);
 }
 
@@ -88,7 +92,7 @@ static void generate_for(mpc_ast_t* ast) {
 
   // Emit the FOR for the proper loop variable
   uint8_t id = intern_ident(ast->children[1]->contents);
-  putchar(FOR0 + id);
+  pushchar(FOR0 + id);
 
   // Emit start and stop ranges
   uint32_t num = parse_number(ast->children[3]);
@@ -151,7 +155,7 @@ static void generate_call(mpc_ast_t* ast) {
     exit(-1);
   }
   // Emit the initial opcode
-  putchar(fn.opcode);
+  pushchar(fn.opcode);
 
   for (int i = 0; i < nargs; i++) {
     generate_statement(ast->children[i * 2 + 2]);
@@ -160,13 +164,13 @@ static void generate_call(mpc_ast_t* ast) {
 }
 
 static void generate_get(mpc_ast_t* ast) {
-  putchar(GET0 + intern_ident(ast->contents));
+  pushchar(GET0 + intern_ident(ast->contents));
 }
 
 static void generate_sum(mpc_ast_t* ast) {
   switch (ast->children[1]->contents[0]) {
-    case '-': putchar(SUB); break;
-    case '+': putchar(ADD); break;
+    case '-': pushchar(SUB); break;
+    case '+': pushchar(ADD); break;
     default: assert(false);
   }
   generate_statement(ast->children[0]);
@@ -175,9 +179,9 @@ static void generate_sum(mpc_ast_t* ast) {
 
 static void generate_product(mpc_ast_t* ast) {
   switch (ast->children[1]->contents[0]) {
-    case '*': putchar(MUL); break;
-    case '/': putchar(DIV); break;
-    case '%': putchar(MOD); break;
+    case '*': pushchar(MUL); break;
+    case '/': pushchar(DIV); break;
+    case '%': pushchar(MOD); break;
     default: assert(false);
   }
   generate_statement(ast->children[0]);
@@ -186,12 +190,12 @@ static void generate_product(mpc_ast_t* ast) {
 
 static void generate_equality(mpc_ast_t* ast) {
   const char* op = ast->children[1]->contents;
-  if (!strcmp("<", op)) putchar(LT);
-  else if (!strcmp(">", op)) putchar(GT);
-  else if (!strcmp("<=", op)) putchar(LTE);
-  else if (!strcmp(">=", op)) putchar(GTE);
-  else if (!strcmp("==", op)) putchar(EQ);
-  else if (!strcmp("!=", op)) putchar(NEQ);
+  if (!strcmp("<", op)) pushchar(LT);
+  else if (!strcmp(">", op)) pushchar(GT);
+  else if (!strcmp("<=", op)) pushchar(LTE);
+  else if (!strcmp(">=", op)) pushchar(GTE);
+  else if (!strcmp("==", op)) pushchar(EQ);
+  else if (!strcmp("!=", op)) pushchar(NEQ);
   else assert(-1);
   generate_statement(ast->children[0]);
   generate_statement(ast->children[2]);
@@ -206,12 +210,12 @@ static void generate_value(mpc_ast_t* ast) {
 }
 
 static void generate_not(mpc_ast_t* ast) {
-  putchar(NOT);
+  pushchar(NOT);
   generate_statement(ast->children[1]);
 }
 
 static void generate_if(mpc_ast_t* ast) {
-  putchar(IF);
+  pushchar(IF);
   generate_statement(ast->children[1]);
   generate_block(ast->children[2]);
 }
@@ -235,11 +239,11 @@ static void generate_statement(mpc_ast_t* ast) {
   assert(false);
 }
 static void generate_block(mpc_ast_t* ast) {
-  if (ast->children_num > 3) putchar(DO);
+  if (ast->children_num > 3) pushchar(DO);
   for (int i = 1; i < ast->children_num - 1; i++) {
     generate_statement(ast->children[i]);
   }
-  if (ast->children_num > 3) putchar(END);
+  if (ast->children_num > 3) pushchar(END);
 }
 
 int main() {
@@ -335,5 +339,16 @@ int main() {
   stdin_free(input);
 
   mpc_cleanup(21, State, Ident, Number, Hex, Dec, Bool, For, Range, By, If, Assign, Expr, Call, Not, Or, And, Equal, Comp, Sum, Prod, Value, Block, Prog);
+
+  // Tag ends with marker bytes so we can tell apart from random serial stuff.
+  output[0] = '(';
+  output[1] = ']';
+  output[output_len++] = '[';
+  output[output_len++] = ')';
+  // Write full length (including header/trailer as big-endian uint16_t)
+  output[2] = output_len >> 8;
+  output[3] = output_len & 0xff;
+
+  write(1, output, output_len);
 
 }
