@@ -51,11 +51,11 @@ Run the following to test the compiler and interpreter in a linux simulator
 To test on device, do:
 
 ```sh
-./color-control-compile < scripts/power-rainbow.script | ./color-control-upload /dev/ttyACM0
+./color-control-compile < scripts/power-rainbow.script > /dev/ttyACM0
 ```
 
-You can test the framing in linux by passing in `/dev/stdout` as the serial device:
+You can see the framed bytecode in linux:
 
 ```sh
-./color-control-compile < scripts/power-rainbow.script | ./color-control-upload /dev/stdout | hexdump -C
+./color-control-compile < scripts/power-rainbow.script | hexdump -C
 ```

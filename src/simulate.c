@@ -3,9 +3,12 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <errno.h>
 
 #include "libs/color-control.c"
-#include "libs/stdin.c"
+#include "libs/reader.c"
+
 
 static void on_update(uint8_t* pixels) {
   for (int i = 0; i < LED_COUNT * LED_BPP; i += LED_BPP) {
@@ -35,16 +38,40 @@ static void on_error(uint32_t code, const char* msg) {
   exit(-code);
 }
 
-int main() {
-  uint8_t* input = stdin_read(NULL);
-  vm_t vm = (vm_t){
-    .on_update = on_update,
-    .on_pin = on_pin,
-    .on_error = on_error,
-    .on_delay = delay,
-    .vars = { 0, 0, 0, 0, 0, 0, 0, 0 },
-    .pc = input
-  };
+static vm_t vm = (vm_t){
+  .on_update = on_update,
+  .on_pin = on_pin,
+  .on_error = on_error,
+  .on_delay = delay,
+  .vars = { 0, 0, 0, 0, 0, 0, 0, 0 },
+  .pc = NULL
+};
+
+static void run_program(uint8_t* code) {
+  printf("Running program...\n");
+  vm.pc = code;
   printf("result=%u\n", eval(&vm));
-  stdin_free(input);
+}
+
+#define CHUNK_SIZE 16
+int main() {
+  reader_t* reader = NULL;
+  while (true) {
+    uint8_t buf[CHUNK_SIZE];
+    ssize_t bytes_read = read(0, buf, CHUNK_SIZE);
+    if (bytes_read < 0) {
+      fprintf(stderr, "Problem reading data from stdin: %s\n", strerror(errno));
+      return -1;
+    }
+    if (!bytes_read) return -1;
+    reader_result_t res = reader_push(&reader, buf, bytes_read);
+    if (res == READER_NEED_MORE) continue;
+    if (res == READER_DONE) {
+      run_program(reader->body);
+      reader_cleanup(&reader);
+      return 0;
+    }
+    fprintf(stderr, "Ignoring invalid data: code %d\n", res);
+    reader_cleanup(&reader);
+  }
 }

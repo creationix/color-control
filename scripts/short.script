@@ -1,0 +1,18 @@
+#!/home/tim/Code/color-control/color-control-compile
+for o in 0..600 by 100 {
+  for c in 0..7 {
+    write(c, hue(o + c * 57))
+  }
+  update()
+  delay(16)
+}
+for o in 600..0 by 100 {
+  for c in 0..7 {
+    write(c, hue(o + c * 57))
+  }
+  update()
+  delay(16)
+}
+fill(0)
+update()
+42

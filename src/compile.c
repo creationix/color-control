@@ -341,10 +341,10 @@ int main() {
   mpc_cleanup(21, State, Ident, Number, Hex, Dec, Bool, For, Range, By, If, Assign, Expr, Call, Not, Or, And, Equal, Comp, Sum, Prod, Value, Block, Prog);
 
   // Tag ends with marker bytes so we can tell apart from random serial stuff.
-  output[0] = '<';
-  output[1] = '[';
-  output[output_len++] = ']';
-  output[output_len++] = '>';
+  output[0] = '(';
+  output[1] = ']';
+  output[output_len++] = '[';
+  output[output_len++] = ')';
   // Write full length (including header/trailer as big-endian uint16_t)
   output[2] = output_len >> 8;
   output[3] = output_len & 0xff;

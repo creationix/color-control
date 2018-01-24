@@ -1,0 +1,13 @@
+for i in 0..3 {
+  fill(0xff0000)
+  update()
+  delay(2000)
+  fill(0x00ff00)
+  update()
+  delay(2000)
+  fill(0x0000ff)
+  update()
+  delay(2000)
+}
+fill(0)
+update()
