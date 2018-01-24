@@ -50,12 +50,12 @@ static void run_program(reader_t* reader) {
   };
   printf("result=%u\n", eval(&vm));
 }
-
+#define CHUNK_SIZE 16
 int main() {
   reader_t* reader = NULL;
   while (true) {
-    uint8_t buf[64];
-    ssize_t bytes_read = read(0, buf, 64);
+    uint8_t buf[CHUNK_SIZE];
+    ssize_t bytes_read = read(0, buf, CHUNK_SIZE);
     if (bytes_read < 0) {
       fprintf(stderr, "Problem reading data from stdin: %s\n", strerror(errno));
       return -1;
