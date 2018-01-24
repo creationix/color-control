@@ -8,3 +8,5 @@ for i in 0..1000 {
   update()
   delay(50)
 }
+fill(0)
+update()
