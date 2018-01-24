@@ -2,8 +2,7 @@
 CFLAGS=-Werror -Wall -Wshadow -Wpointer-arith
 TARGETS= \
  	color-control-compile \
-	color-control-simulate \
-	color-control-upload
+	color-control-simulate
 
 all: $(TARGETS)
 
@@ -19,10 +18,10 @@ color-control-%: src/%.c src/libs/stdin.c src/libs/stdin.h src/libs/color-contro
 test: test-simulator test-frame test-upload
 
 test-simulator: $(TARGETS)
-	./color-control-compile < scripts/power-rainbow.script | ./color-control-simulate
+	./color-control-compile < scripts/short.script | ./color-control-simulate
 
 test-frame: $(TARGETS)
-	./color-control-compile < scripts/power-rainbow.script | ./color-control-upload /dev/stdout | hexdump -C
+	./color-control-compile < scripts/short.script | hexdump -C
 
 test-upload: $(TARGETS)
-	./color-control-compile < scripts/power-rainbow.script | ./color-control-upload /dev/ttyACM0
+	./color-control-compile < scripts/short.script > /dev/ttyACM0
