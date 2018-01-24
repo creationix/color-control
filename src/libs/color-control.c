@@ -137,10 +137,10 @@ static uint32_t eval_fill(vm_t* vm) {
 static uint32_t eval_fade(vm_t* vm) {
   uint32_t rgb = eval(vm);
   // y is mix between values
-  // 0 is all left
-  // 255 is all right
+  // 0 is all old value
+  // 255 is all new value
   uint32_t y = (eval(vm) & 0xff) + 1;
-  uint32_t x = 0;
+  uint32_t x = 256 - y + 1;
   for (int i = 0; i < LED_COUNT * LED_BPP; i += LED_BPP) {
     vm->pixels[i + 0] = (vm->pixels[i + 0] * x + ((rgb >> 16) & 0xff) * y) >> 8;
     vm->pixels[i + 1] = (vm->pixels[i + 1] * x + ((rgb >>  8) & 0xff) * y) >> 8;

@@ -1,0 +1,10 @@
+h = 0
+i = 0
+for i in 0..1000 {
+  i = (i + 1) % 8
+  h = (h + 57) % 0x600
+  fade(0, 90)
+  write(i, hue(h))
+  update()
+  delay(50)
+}
