@@ -38,18 +38,21 @@ static void on_error(uint32_t code, const char* msg) {
   exit(-code);
 }
 
-static void run_program(reader_t* reader) {
+static vm_t vm = (vm_t){
+  .on_update = on_update,
+  .on_pin = on_pin,
+  .on_error = on_error,
+  .on_delay = delay,
+  .vars = { 0, 0, 0, 0, 0, 0, 0, 0 },
+  .pc = NULL
+};
+
+static void run_program(uint8_t* code) {
   printf("Running program...\n");
-  vm_t vm = (vm_t){
-    .on_update = on_update,
-    .on_pin = on_pin,
-    .on_error = on_error,
-    .on_delay = delay,
-    .vars = { 0, 0, 0, 0, 0, 0, 0, 0 },
-    .pc = reader->body
-  };
+  vm.pc = code;
   printf("result=%u\n", eval(&vm));
 }
+
 #define CHUNK_SIZE 16
 int main() {
   reader_t* reader = NULL;
@@ -64,7 +67,7 @@ int main() {
     reader_result_t res = reader_push(&reader, buf, bytes_read);
     if (res == READER_NEED_MORE) continue;
     if (res == READER_DONE) {
-      run_program(reader);
+      run_program(reader->body);
       reader_cleanup(&reader);
       return 0;
     }
