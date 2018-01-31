@@ -11,7 +11,7 @@ for o in 600..0 by 100 {
     write(c, hue(o + c * 57))
   }
   update()
-  delay(16)
+  delay(33)
 }
 fill(0)
 update()

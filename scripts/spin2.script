@@ -3,10 +3,10 @@ i = 0
 for i in 0..100 {
   i = (i + 1) % 8
   h = (h + 57) % 0x600
-  for j in 0..5 {
+  for j in 0..2 {
     write(i, 0)
     update()
-    fade(hue(h), 30)
+    fade(hue(h), 15)
     delay(16)
   }
 }

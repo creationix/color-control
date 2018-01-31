@@ -2,7 +2,7 @@
 h = 0
 
 # Fade to full brightness
-for b in 0..255 {
+for b in 0..255 by 2 {
   h = (h + 7) % 0x600
   for c in 0..7 {
     write(c, mix(0, hue(h + c * 57), b))
@@ -13,7 +13,7 @@ for b in 0..255 {
 
 # Fade back down...
 
-for b in 255..0 {
+for b in 255..0 by 2 {
   h = (h + 7) % 0x600
   for c in 0..7 {
     write(c, mix(0, hue(h + c * 57), b))
