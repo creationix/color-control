@@ -1,0 +1,22 @@
+# Notice we don't reset the h variable, this way it's different every run.
+
+# Fade to full brightness
+for b in 0..40 {
+  h = (h + 7) % 0x600
+  for c in 0..7 {
+    write(c, mix(0, hue(h + c * 57), b / 2))
+  }
+  update()
+  delay(16)
+}
+
+# Fade back down...
+
+for b in 40..0 {
+  h = (h + 7) % 0x600
+  for c in 0..7 {
+    write(c, mix(0, hue(h + c * 57), b / 2))
+  }
+  update()
+  delay(16)
+}
