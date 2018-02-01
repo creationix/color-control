@@ -17,7 +17,7 @@ typedef struct {
   // need to change color
   void (*on_update)(uint8_t* pixels);
   // Called to turn a pin on of off
-  void (*on_pin)(uint8_t pin, bool state);
+  void (*on_pin)(uint8_t bank, uint8_t pin, bool state);
   // Callback for runtime exceptions.
   void (*on_error)(uint32_t code, const char* msg);
   // Callback provided by consumer.  This is called when the system wants to
@@ -71,7 +71,7 @@ typedef enum {
   FADE, // (RGB, split) - mix all pixels with given color
 
   // External I/O functions
-  DELAY, UPDATE, PIN
+  DELAY, UPDATE, PINA, PINB
 } opcode_t;
 
 // Macros to generating bytecode for literals in C

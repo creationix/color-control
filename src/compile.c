@@ -132,7 +132,8 @@ static fn_def_t fns[] = {
   {"fade", 2, FADE},
   {"write", 2, WRITE},
   {"update", 0, UPDATE},
-  {"pin", 2, PIN},
+  {"pina", 2, PINA},
+  {"pinb", 2, PINB},
   {NULL}
 };
 

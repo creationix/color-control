@@ -117,10 +117,10 @@ static uint32_t eval_update(vm_t* vm) {
   vm->on_update(vm->pixels);
   return 0;
 }
-static uint32_t eval_pin(vm_t* vm) {
+static uint32_t eval_pin(vm_t* vm, uint8_t bank) {
   uint8_t pin = eval(vm);
   bool state = eval(vm);
-  vm->on_pin(pin, state);
+  vm->on_pin(bank, pin, state);
   return state;
 }
 
@@ -225,7 +225,7 @@ uint32_t eval(vm_t* vm) {
 
     case DELAY: return eval_delay(vm);
     case UPDATE: return eval_update(vm);
-    case PIN: return eval_pin(vm);
+    case PINA: case PINB: return eval_pin(vm, op - PINA);
 
     case END:
       vm->on_error(op, "Illegal opcode");
@@ -265,7 +265,7 @@ static void skip(vm_t* vm) {
     case ADD: case SUB: case MUL: case DIV: case MOD:
     case LT: case GT: case LTE: case GTE: case EQ: case NEQ:
     case AND: case OR: case WHILE: case IF:
-    case PIN: case WRITE: case FADE:
+    case PINA: case PINB: case WRITE: case FADE:
       return skip(vm), skip(vm);
 
     // Consume 3
