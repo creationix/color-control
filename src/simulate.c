@@ -53,10 +53,10 @@ static void run_program(uint8_t* code) {
   printf("result=%u\n", eval(&vm));
 }
 
+static reader_t reader;
+
 #define CHUNK_SIZE 16
 int main() {
-  reader_t reader;
-  reader_reset(&reader);
   while (true) {
     uint8_t buf[CHUNK_SIZE];
     ssize_t bytes_read = read(0, buf, CHUNK_SIZE);
