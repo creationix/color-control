@@ -20,8 +20,8 @@ static void on_update(uint8_t* pixels) {
   printf("\x1b[0m\n");
 }
 
-static void on_pin(uint8_t pin, bool state) {
-  printf("Turn pin-%d %s\n", pin, state ? "ON" : "OFF");
+static void on_pin(uint8_t bank, uint8_t pin, bool state) {
+  printf("Turn pin%s-%d %s\n", bank ? "B": "A", pin, state ? "ON" : "OFF");
 }
 
 static void delay(uint32_t ms) {
@@ -55,7 +55,8 @@ static void run_program(uint8_t* code) {
 
 #define CHUNK_SIZE 16
 int main() {
-  reader_t* reader = NULL;
+  reader_t reader;
+  reader_reset(&reader);
   while (true) {
     uint8_t buf[CHUNK_SIZE];
     ssize_t bytes_read = read(0, buf, CHUNK_SIZE);
@@ -67,11 +68,11 @@ int main() {
     reader_result_t res = reader_push(&reader, buf, bytes_read);
     if (res == READER_NEED_MORE) continue;
     if (res == READER_DONE) {
-      run_program(reader->body);
-      reader_cleanup(&reader);
+      run_program(reader.body);
+      reader_reset(&reader);
       return 0;
     }
     fprintf(stderr, "Ignoring invalid data: code %d\n", res);
-    reader_cleanup(&reader);
+    reader_reset(&reader);
   }
 }

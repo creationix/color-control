@@ -1,0 +1,2 @@
+# Disable LEDS on ethernet port for minimal light pollution in dark rooms.
+pinb(8, false)
