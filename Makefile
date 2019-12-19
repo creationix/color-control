@@ -9,6 +9,10 @@ all: $(TARGETS)
 clean:
 	rm -f $(TARGETS)
 
+color-control.wasm: src/wasm.c src/libs/color-control.c
+	EMCC_ONLY_FORCED_STDLIBS=1 emcc -Os $< -o $@ -s ERROR_ON_UNDEFINED_SYMBOLS=0 -s EMIT_EMSCRIPTEN_METADATA -Wl,--export-table
+	wasm2wat $@ -o color-control.wat
+
 src/mpc/mpc.c:
 	git submodule update --init
 
